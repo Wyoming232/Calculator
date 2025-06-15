@@ -1,8 +1,4 @@
 # CLI Calculator
-Of course. Reframing the README for a personal portfolio project is a great idea. The focus shifts from collaboration to showcasing your skills, thought process, and what you learned.
-
-Here is a revised README tailored for a personal project meant for your LinkedIn profile.
-
 C-Calc: A Command-Line Scientific Calculator
 Project Overview
 C-Calc is a personal development project to build a powerful, lightweight scientific calculator that runs from the command line. Written entirely in C, it is designed to parse and evaluate complex mathematical expressions, serving as a practical exercise in applying core computer science concepts.
