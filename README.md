@@ -27,6 +27,8 @@ Parentheses Handling: Support for deeply nested parentheses.
 
 Error Handling: Provides clear error messages for invalid syntax or mathematical errors like division by zero.
 
+Input Format: The parser will require numbers and expressions to be separated by a " ", and the lack of a "*" operator will result in error, not multiplication.
+
 Tech Stack
 
 Language: C
