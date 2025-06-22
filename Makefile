@@ -18,3 +18,8 @@ main.o: main.c helpers.h
 
 helpers.o: helpers.c helpers.h
 	$(CC) $(CFLAGS) -c helpers.c
+
+.PHONY: clean
+
+clean:
+	rm -f $(OBJS) $(TARGET)
