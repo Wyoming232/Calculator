@@ -42,7 +42,6 @@ void reverse(char *str) {
 
 char *numToString(int num) {
     char *str = NULL;
-    int idx = 0;
     int isNegative = 0;
     long long tempNum;
 
@@ -94,7 +93,6 @@ char *numToString(int num) {
     return str;
 }
 
-
 char * performOperation(char * a, char * b, char * op) {
     int c = stringToNum(a);
     int d = stringToNum(b);
@@ -120,10 +118,9 @@ char * performOperation(char * a, char * b, char * op) {
     return result_str;
 }
 
-// Helper function to check if a string is an operator
 bool isOperator(char *s) {
-    return (s != NULL && (strcmp(s, "+") == 0 || strcmp(s, "-") == 0 ||
-            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0);
+    return ((s != NULL) && ((strcmp(s, "+") == 0 || strcmp(s, "-") == 0 ||
+            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0));
 }
 
 bool isLeftAssociative(char * operator) {
@@ -164,4 +161,97 @@ void tokenize(char * seq, char ** tokens, int  * num_tokens) {
     }
     tokens[i] = NULL; // 4. Null-terminates the array of pointers
     free(str_copy); // 5. Frees the temporary copy
+}
+
+// This function gets the precedence of an operator
+Precedence getPrecedence(char * operator) {
+    if (operator == NULL || strlen(operator) != 1) {
+        return PREC_NONE; // Invalid operator
+    }
+    switch (operator[0]) {
+        case '+':
+        case '-':
+            return PREC_ADDSUB;
+        case '*':
+        case '/':
+            return PREC_MULDIV;
+        case '^':
+            return PREC_EXP; // Assuming '^' has the highest precedence
+        default:
+            return PREC_NONE;
+    }
+}
+
+// Stack Functions
+Stack * createStack(int cap) {
+    if(cap <= 0) return NULL;
+
+    Stack * stack = malloc(sizeof(Stack));
+    if(stack == NULL) {
+        perror("Stack allocation failed"); // Use perror for system errors
+        return NULL;
+    }
+
+    stack->collection = (char**)calloc(cap, sizeof(char*));
+    if(stack->collection == NULL) {
+        perror("Collection allocation failed");
+        free(stack);
+        return NULL;
+    }
+
+    stack->capacity = cap;
+    stack->size = 0;
+
+    return stack;
+}
+
+void destroyStack(Stack * stack) {
+    if (stack == NULL) return;
+
+    for (int i = 0; i < stack->capacity; i++) {
+        free(stack->collection[i]);
+    }
+
+    free(stack->collection);
+    free(stack);
+}
+
+bool isFull(Stack * stack) {
+    return stack->size == stack->capacity;
+}
+
+bool isEmpty(Stack * stack) {
+    return (stack->size == 0);
+}
+
+// Pop an element. Caller takes ownership of the char* and must free it.
+bool pop(Stack * stack, char ** top) {
+    if (isEmpty(stack)) return false;
+
+    stack->size--;
+    *top = stack->collection[stack->size]; // Get the element
+
+    stack->collection[stack->size] = NULL; // Clear the slot for safety
+    // Note: Caller is responsible for freeing (1) the string pointed to by *top and (2)stack->collection[stack->size] since it was dynamically allocated.
+
+    return true;
+}
+
+// Push an element. Creates a copy of the string.
+bool push(Stack * stack, char * str_to_push) {
+    if(isFull(stack)) return false;
+
+    // Allocate memory for the new string
+    char *new_str = strdup(str_to_push);
+
+    stack->collection[stack->size] = new_str; // Store the pointer to the new string
+    stack->size++;
+    return true;
+}
+
+// Peek an element (no memory management implications)
+char * peek(Stack * stack) {
+    if (isEmpty(stack)) return NULL;
+
+    return stack->collection[stack->size - 1];
 }
