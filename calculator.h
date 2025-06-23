@@ -24,6 +24,7 @@ void calculator(char * seq);
 char ** infix_postfix(Stack * stack, char ** tok, char ** arr, int num_tokens);
 void tokenize(char * seq, char ** tokens, int * num_tokens);
 bool validityCheck(Stack * stack);
+bool isLeftAssociative(char * operator);
 
 // Getting precedence of an operator, and highest precedence in the stack respectively
 Precedence getPrecedence(char * operator);

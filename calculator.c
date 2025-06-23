@@ -87,11 +87,11 @@ Case 5 (maxPrecedence is '(' and nextPrecedence is ')') : pop all operators off 
 Check to see if this works with test cases in main.c
  */
 char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens) {
-    char * curr, * next;
+    char * curr, * next, *popped;
     Precedence currPrecedence = PREC_NONE, nextPrecedence = PREC_NONE;
     int curr_pos_tokens = 0;
     int arr_pos = 0;
-    int inParens = 0;
+    // int inParens = 0;
 
     while (curr_pos_tokens < num_tokens) {
         curr = peek(stack); // Get the top of the stack
@@ -103,11 +103,11 @@ char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens
             arr[arr_pos++] = strdup(next); // Case 1: next is a number or variable, store it in the array
         } else if (strcmp(next, "(") == 0) {
             // Special case: if the current precedence is '(', we need to handle it differently
-            inParens++;
+            // inParens++;
             push(stack, next); // If the current precedence is '(', push the next token onto the stack
-        } else if(strcmp(next, ")") == 0 && inParens) {
+        } else if(strcmp(next, ")") == 0) {
             // Case 5: maxPrecedence is 1 and nextPrecedence is ')'
-            char * popped = peek(stack); // Peek the top of the stack
+            popped = peek(stack); // Peek the top of the stack
             while(strcmp(popped, "(") != 0) {
                 pop(stack, &popped); // Pop all operators off the stack until '('
                 if(strcmp(popped, "(") == 0) {
@@ -115,23 +115,29 @@ char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens
                 }
                 arr[arr_pos++] = popped; // Store operators in the array
             }
-            inParens--; // Decrease the parentheses count
-        } else if((nextPrecedence && isEmpty(stack)) || (nextPrecedence > currPrecedence)) {
-            // Case 2 & 3: next is an operator and stack is empty or nextPrecedence is greater than currPrecedence
-            push(stack, next); // Push the operator onto the stack
-        } else if(nextPrecedence <= currPrecedence) {
-            // Case 4: next is an operator and currPrecedence is higher than nextPrecedence
-            char * popped;
-            pop(stack, &popped); // Pop the current operator from the stack
+            // inParens--;  Decrease the parentheses count
+        } else if(isEmpty(stack)) {
+            push(stack, next); // Case 2: next is an operator and stack is empty, push it onto the stack
+        } else {
+            while(!isEmpty(stack) && strcmp(curr, "(") != 0) {
+                curr = peek(stack); // Get the current operator from the stack
+                currPrecedence = getPrecedence(curr);
+                // Case 2 & 3: next is an operator and stack is empty or nextPrecedence is greater than currPrecedence
+                if ((isLeftAssociative(next) && nextPrecedence <= currPrecedence) ||
+                    (!isLeftAssociative(next) && nextPrecedence < currPrecedence)) {
+                    pop(stack, &popped); // Pop the current operator from the stack
+                    arr[arr_pos++] = popped; // Store it in the array
+                } else {
+                    break;
+                }
+            }
             push(stack, next); // Push the next operator onto the stack
-            arr[arr_pos++] = popped; // Store it in the array
         }
         curr_pos_tokens++;
     }
 
     // After processing all tokens, pop any remaining operators from the stack
     while (!isEmpty(stack)) {
-        char * popped;
         pop(stack, &popped); // Pop remaining operators
         arr[arr_pos++] = popped; // Store them in the array
     }
@@ -139,6 +145,12 @@ char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens
     arr[arr_pos] = NULL; // Null-terminate the array to indicate the end of the postfix expression
 
     return arr; // Return the array containing the postfix expression
+}
+
+bool isLeftAssociative(char * operator) {
+    // Check if the operator is left associative
+    return (strcmp(operator, "+") == 0 || strcmp(operator, "-") == 0 ||
+            strcmp(operator, "*") == 0 || strcmp(operator, "/") == 0);
 }
 
 /* // takes array of postfix expression from calculator() function and detemines validity
