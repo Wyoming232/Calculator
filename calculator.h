@@ -20,11 +20,19 @@ typedef enum {
 #define MAX_TOKENS 256
 #define EXIT "exit"
 
-void calculator(char * seq);
-char ** infix_postfix(Stack * stack, char ** tok, char ** arr, int num_tokens);
+int calculator(char * seq);
+char ** infix_postfix(Stack * stack, char ** tok, char ** arr, int * num_tokens);
+int evalRPN(char ** arr, int num_tokens);
+
 void tokenize(char * seq, char ** tokens, int * num_tokens);
 bool validityCheck(Stack * stack);
 bool isLeftAssociative(char * operator);
+
+// evaluation helpers
+int stringToNum(char * a);
+bool isOperator(char *s);
+char * numToString(int num);
+char * performOperation(char * a, char * b, char * op);
 
 // Getting precedence of an operator, and highest precedence in the stack respectively
 Precedence getPrecedence(char * operator);

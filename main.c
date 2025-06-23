@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include "calculator.h"
 
-#define INFIXPOSTFIX
+#define CALCULATOR
 
 typedef struct {
         const char* title;
@@ -65,18 +65,29 @@ void run_comprehensive_test_suite() {
 }
 
 int main() {
-    // char *buffer = malloc(MAX_TOKENS * sizeof(char));
-    // int result;
+    char buffer[MAX_TOKENS]; // Buffer for user input, assuming max token length of 10
+    double result;
 
-    #ifdef CALCULATOR
-    printf("Welcome to calculator. Please enter your expression on the next line. Ensure that your expression uses spaces to distinguish between numbers and operators. Type ""exit"" to leave the program\n");
-    //calculator loop until input is the string defined by EXIT condition
-    while(strcmp(buffer, EXIT) == 0){
-        scanf(">> %s", buffer);
+    printf("Welcome to Calculator. Enter an expression or type 'exit' to quit.\n");
+
+    for (;;) {
+        printf(">> ");
+
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            break;
+        }
+
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        if (strcmp(buffer, EXIT) == 0) {
+            printf("Goodbye!\n");
+            break;
+        }
+
         result = calculator(buffer);
-        printf("Result : %.5f\n", &result);
+
+        printf("Result: %.5f\n", result);
     }
-    #endif
 
     
     // TO test the infix to postfix conversion
