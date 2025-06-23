@@ -23,19 +23,21 @@ void calculator(char * seq) {
     char ** tokens = malloc(sizeof(char *) * MAX_TOKENS);
     tokenize(seq, tokens, &num_tokens);
     
-    char ** arr = malloc(sizeof(char *) * num_tokens);
+    char ** arr = malloc(sizeof(char *) * (num_tokens + 1));
 
     Stack * stack = createStack(num_tokens);
 
     arr = infix_postfix(stack, tokens, arr, num_tokens);
 
+    int i = 0;
     // printf("Postfix expression: ");
-    for (int i = 0; i < num_tokens; i++) {
-        if (arr[i] != NULL) {
-            printf("%s ", arr[i]); // Print each token in the postfix expression
-            free(arr[i]); // Free each token after printing
-        }
+    while (arr[i] != NULL) {
+        printf("%s ", arr[i]); // Print each token in the postfix expression
+        free(arr[i]); // Free each token after printing
+        i++;
     }
+
+    destroyStack(stack); // Clean up the stack to prevent memory leaks
 }
 
 // This function tokenizes the input string by spaces and stores each token in the tokens array (can be modified later to tokenize by other delimiters
@@ -97,27 +99,26 @@ char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens
         currPrecedence = getPrecedence(curr);
         nextPrecedence = getPrecedence(next);
 
-        if (!nextPrecedence) {
-            // Case 1: next is a number
-            arr[arr_pos++] = strdup(next); // Store the number in the array
-        } else if (currPrecedence == PREC_OPEN) {
+        if (!nextPrecedence && strcmp(next, "(") && strcmp(next, ")")){
+            arr[arr_pos++] = strdup(next); // Case 1: next is a number or variable, store it in the array
+        } else if (strcmp(next, "(") == 0) {
             // Special case: if the current precedence is '(', we need to handle it differently
             inParens++;
             push(stack, next); // If the current precedence is '(', push the next token onto the stack
-        } else if((nextPrecedence && isEmpty(stack)) || (nextPrecedence > currPrecedence)) {
-            // Case 2 & 3: next is an operator and stack is empty or nextPrecedence is greater than currPrecedence
-            push(stack, next); // Push the operator onto the stack
-        } else if(nextPrecedence == PREC_CLOSE && inParens) {
+        } else if(strcmp(next, ")") == 0 && inParens) {
             // Case 5: maxPrecedence is 1 and nextPrecedence is ')'
             char * popped = peek(stack); // Peek the top of the stack
             while(strcmp(popped, "(") != 0) {
                 pop(stack, &popped); // Pop all operators off the stack until '('
-                if(getPrecedence(popped) == PREC_OPEN) {
+                if(strcmp(popped, "(") == 0) {
                     break;
                 }
                 arr[arr_pos++] = popped; // Store operators in the array
             }
             inParens--; // Decrease the parentheses count
+        } else if((nextPrecedence && isEmpty(stack)) || (nextPrecedence > currPrecedence)) {
+            // Case 2 & 3: next is an operator and stack is empty or nextPrecedence is greater than currPrecedence
+            push(stack, next); // Push the operator onto the stack
         } else if(nextPrecedence <= currPrecedence) {
             // Case 4: next is an operator and currPrecedence is higher than nextPrecedence
             char * popped;
@@ -134,6 +135,8 @@ char ** infix_postfix(Stack * stack, char ** tokens, char ** arr, int num_tokens
         pop(stack, &popped); // Pop remaining operators
         arr[arr_pos++] = popped; // Store them in the array
     }
+
+    arr[arr_pos] = NULL; // Null-terminate the array to indicate the end of the postfix expression
 
     return arr; // Return the array containing the postfix expression
 }

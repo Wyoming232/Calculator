@@ -17,10 +17,8 @@ Precedence getPrecedence(char * operator) {
         case '*':
         case '/':
             return PREC_MULDIV;
-        case '(':
-            return PREC_OPEN;
-        case ')':
-            return PREC_CLOSE;
+        case '^':
+            return PREC_EXP; // Assuming '^' has the highest precedence
         default:
             return PREC_NONE;
     }

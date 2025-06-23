@@ -11,11 +11,10 @@ typedef struct{
 }Stack;
 
 typedef enum {
-    PREC_NONE = 0,    // For non-operators or initial state
+    PREC_NONE = 0,    // For parens or initial state
     PREC_ADDSUB = 1,        // + -
     PREC_MULDIV = 2,      // * /
-    PREC_OPEN = 3,        // ()
-    PREC_CLOSE = -1      // Literals, group ()
+    PREC_EXP = 3,    // ^ (exponentiation)
 } Precedence;
 
 #define MAX_TOKENS 256
