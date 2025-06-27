@@ -179,33 +179,3 @@ int evalRPN(char** tokens, int tokensSize) {
 
     return final_result;
 }
-
-/* // takes array of postfix expression from calculator() function and detemines validity
-// Case 1 : division by 0
-// Case 2 : check whether the postfix stack has an odd number of elements (requirement for valid stack). This is just a prelim check, since it is possible that there are two unpaired operators or operands and several other disqualifying cases.
-// Case 3 : Incorrect ordering of parentheses (expression starts with ')' rather than '(', which equates to seeing ')' on the stack
-bool validityCheck(Stack * stack) {
-    if(isEmpty(stack)) {
-        printf("Invalid expression: Empty stack.\n");
-        return false;
-    }
-    // Check for division by zero
-    if(top == '/' && stack->size > 0) {
-        printf("Invalid expression: Division by zero.\n");
-        return false;
-    }
-
-    // Check for odd number of elements in the stack
-    if(stack->size % 2 == 0) {
-        printf("Invalid expression: Even number of elements in the stack.\n");
-        return false;
-    }
-
-    // Check for incorrect ordering of parentheses
-    if(top == ')') {
-        printf("Invalid expression: Unmatched closing parenthesis.\n");
-        return false;
-    }
-
-    return true;
-} */

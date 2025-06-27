@@ -7,6 +7,43 @@
 #include "calculator.h"
 
 // Utility functions
+bool isDigit(char c) {
+    return (c >= '0' && c <= '9');
+}
+
+bool isOperatorOrParenthesis(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '(' || c == ')');
+}
+
+bool isOperator(char *s) {
+    return ((s != NULL) && ((strcmp(s, "+") == 0 || strcmp(s, "-") == 0 ||
+            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0));
+}
+
+bool isLeftAssociative(char * operator) {
+    // Check if the operator is left associative
+    return (strcmp(operator, "+") == 0 || strcmp(operator, "-") == 0 ||
+            strcmp(operator, "*") == 0 || strcmp(operator, "/") == 0);
+}
+
+char * substring (char * str, int start, int end) {
+    if (str == NULL || start < 0 || end < start || end >= strlen(str)) {
+        fprintf(stderr, "Error: Invalid substring parameters\n");
+        return NULL; // Handle error
+    }
+    
+    char * sub = (char *)malloc((end - start + 2) * sizeof(char)); // +1 for null terminator
+    if (sub == NULL) {
+        perror("Memory allocation failed for substring");
+        return NULL; // Handle memory allocation failure
+    }
+
+    sub = strncpy(sub, str + start, end - start + 1);
+    sub[end - start + 1] = '\0'; // Null-terminate the substring
+
+    return sub;
+}
+
 int stringToNum(char * a) {
     if (a == NULL) {
         fprintf(stderr, "Error: NULL string passed to stringToNum\n");
@@ -118,49 +155,33 @@ char * performOperation(char * a, char * b, char * op) {
     return result_str;
 }
 
-bool isOperator(char *s) {
-    return ((s != NULL) && ((strcmp(s, "+") == 0 || strcmp(s, "-") == 0 ||
-            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0));
-}
-
-bool isLeftAssociative(char * operator) {
-    // Check if the operator is left associative
-    return (strcmp(operator, "+") == 0 || strcmp(operator, "-") == 0 ||
-            strcmp(operator, "*") == 0 || strcmp(operator, "/") == 0);
-}
-
-// This function tokenizes the input string by spaces and stores each token in the tokens array (can be modified later to tokenize by other delimiters
+// This function tokenizes the input string by operator and stores each token in the tokens array (can be modified later to tokenize by other delimiters
 // if needed)
 void tokenize(char * seq, char ** tokens, int  * num_tokens) {
-    char *str_copy = strdup(seq); // 1. Makes a copy to protect original 'seq'
-    if (str_copy == NULL) {
-        perror("Failed to copy string for tokenization");
-        tokens[0] = NULL;
-        return;
-    }
+    int size = strlen(seq);
+    int subStartIdx = 0;
+    int subEndIdx = 0;
 
-    char *token;
-    char *rest = str_copy; // Used by strtok_r to maintain internal state
-    int i = 0;
-
-    // 2. Correct loop condition: checks return value of strtok_r and bounds
-    while ((token = strtok_r(rest, " ", &rest)) != NULL && i < MAX_TOKENS) {
-        tokens[i] = strdup(token); // 3. Copies each token into new memory
-        (*num_tokens)++; // Increment the count of tokens
-        if (tokens[i] == NULL) {
-            perror("Failed to duplicate token");
-            // --- Crucial cleanup if duplication fails mid-loop ---
-            for (int j = 0; j < i; j++) {
-                free(tokens[j]);
+    for (int i = 0; i < size; i++) {
+        if (seq[i] == ' ') {
+            continue; // Skip spaces
+        } else if (isDigit(seq[i])) {
+            subStartIdx = i; // Start of a number
+            while (i < size && isDigit(seq[i])) {
+                i++; // Move to the end of the number
             }
-            free(str_copy);
-            tokens[0] = NULL;
-            return;
+            subEndIdx = i - 1; // End of the number
+            tokens[*num_tokens] = substring(seq, subStartIdx, subEndIdx);
+            *num_tokens += 1; // Increment the number of tokens
+            i--; // Adjust i since the for loop will increment it
+        } else if(isOperatorOrParenthesis(seq[i])) {
+            // Handle operators
+            tokens[*num_tokens] = substring(seq, i, i);
+            *num_tokens += 1; // Increment the number of tokens
         }
-        i++;
     }
-    tokens[i] = NULL; // 4. Null-terminates the array of pointers
-    free(str_copy); // 5. Frees the temporary copy
+
+    tokens[*num_tokens] = NULL; // 4. Null-terminates the array of pointers
 }
 
 // This function gets the precedence of an operator

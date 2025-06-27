@@ -20,19 +20,24 @@ typedef enum {
 #define MAX_TOKENS 256
 #define EXIT "exit"
 
+// Function Prototypes
 int calculator(char * seq);
 char ** infix_postfix(Stack * stack, char ** tok, char ** arr, int * num_tokens);
 int evalRPN(char ** arr, int num_tokens);
-
 void tokenize(char * seq, char ** tokens, int * num_tokens);
-bool validityCheck(Stack * stack);
-bool isLeftAssociative(char * operator);
+
 
 // evaluation helpers
+bool isLeftAssociative(char * operator);
 int stringToNum(char * a);
 bool isOperator(char *s);
 char * numToString(int num);
 char * performOperation(char * a, char * b, char * op);
+
+// Lexer helpers
+bool isDigit(char c);
+bool isOperatorOrParenthesis(char c);
+char * substring(char * str, int start, int end);
 
 // Getting precedence of an operator, and highest precedence in the stack respectively
 Precedence getPrecedence(char * operator);
