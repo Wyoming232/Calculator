@@ -12,18 +12,18 @@ bool isDigit(char c) {
 }
 
 bool isOperatorOrParenthesis(char c) {
-    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '(' || c == ')');
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^' || c == '(' || c == ')');
 }
 
 bool isOperator(char *s) {
     return ((s != NULL) && ((strcmp(s, "+") == 0 || strcmp(s, "-") == 0 ||
-            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0));
+            strcmp(s, "*") == 0 || strcmp(s, "/") == 0) || strcmp(s, "^") == 0 || strcmp(s, "%") == 0));
 }
 
 bool isLeftAssociative(char * operator) {
     // Check if the operator is left associative
     return (strcmp(operator, "+") == 0 || strcmp(operator, "-") == 0 ||
-            strcmp(operator, "*") == 0 || strcmp(operator, "/") == 0);
+            strcmp(operator, "*") == 0 || strcmp(operator, "/") == 0 || strcmp(operator, "%") == 0);
 }
 
 char * substring (char * str, int start, int end) {
@@ -147,7 +147,12 @@ char * performOperation(char * a, char * b, char * op) {
             }
             result_str = numToString(c / d);
             break;
-        case '^': result_str = numToString((int)pow(c, d)); break; // Using pow for exponentiation
+        case '^': 
+            result_str = numToString((int)pow(c, d)); 
+            break; // Using pow for exponentiation
+        case '%':
+            result_str = numToString(c % d);
+            break;
         default:
             fprintf(stderr, "Error: Unknown operator '%s'\n", op);
             return NULL; // Indicate error
@@ -192,7 +197,9 @@ Precedence getPrecedence(char * operator) {
     switch (operator[0]) {
         case '+':
         case '-':
+        case '%':
             return PREC_ADDSUB;
+        
         case '*':
         case '/':
             return PREC_MULDIV;
